@@ -1,80 +1,100 @@
-import { StyleSheet, View, Text, ImageBackground,ScrollView } from 'react-native';
-import {useState, useEffect} from 'react';
+import React, { useEffect, useState } from "react";
+import {  SafeAreaView,
+  View,
+  Text,
+  FlatList,
+  SectionList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 
-export default function App(){
-  return(
-    <ScrollView contentContainerStyle= {styles.background} showsVerticalScrollIndicator={false} horizontal={true}>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-      <Text>Hola Mundo</Text>
-    </ScrollView>
-  )
+export default function App() {
+  const [frutas, setFrutas] = useState([]);
+  const [verduras, setVerduras] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const API_URL = "http://127.0.0.1:8000/productos/"; // Cambia esto según tu API
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setFrutas(data.frutas);
+        setVerduras(data.verduras);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Render item para FlatList y SectionList
+  const renderItem = ({ item }) => (
+    <View style={styles.item}>
+      <Text style={styles.nombre}>{item.nombre}</Text>
+    </View>
+  );
+
+  // Para SectionList, definimos las secciones
+  const sections = [
+    { title: "Frutas", data: frutas },
+    { title: "Verduras", data: verduras },
+  ];
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Cargando datos...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Lista de Frutas (FlatList)</Text>
+      <FlatList
+        data={frutas}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+      />
+
+      <Text style={styles.title}>Frutas y Verduras (SectionList)</Text>
+      <SectionList
+        sections={sections}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.header}>{title}</Text>
+        )}
+      />
+    </SafeAreaView>
+  );
 }
 
-// 4. Estilos simples
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 30,
+    paddingHorizontal: 16,
   },
   title: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 22,
+    fontWeight: "bold",
+    marginVertical: 12,
   },
-  subtitle: {
-    color: 'white',
+  header: {
+    fontSize: 20,
+    fontWeight: "bold",
+    backgroundColor: "#ddd",
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    marginTop: 10,
+  },
+  item: {
+    backgroundColor: "#f9c2ff",
+    padding: 10,
+    marginVertical: 4,
+    borderRadius: 5,
+  },
+  nombre: {
     fontSize: 18,
-  }
+  },
 });
